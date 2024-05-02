@@ -1,0 +1,8 @@
+Subject-> Zero-day Windows Microsoft Office  1\\
+
+The vulnerability allows a remote attacker to compromise the affected system. Note, the
+vulnerability is being actively exploited in the wild.
+Link 3: https://msrc.microsoft.com/update-guide/en-US/vulnerability/
+
+Thanks,
+Test
