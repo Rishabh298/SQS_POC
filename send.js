@@ -45,7 +45,7 @@ const sendUserDetails = async () => {
             }
         },
         MessageBody: "Email along with subject & body 2",
-        QueueUrl: "https://sqs.us-east-1.amazonaws.com/637423196416/demoQueue2"
+        QueueUrl: ""
     }
     sqs.sendMessage(params, (err, data)=> {
 if (err) {

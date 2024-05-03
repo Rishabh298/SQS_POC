@@ -5,7 +5,7 @@ var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 
 let readUserDetails = () => {
     var params = {
-        QueueUrl: "https://sqs.us-east-1.amazonaws.com/637423196416/demoQueue2",
+        QueueUrl: "",
         MaxNumberOfMessages: 10,
     };
     sqs.receiveMessage(params, (err, data)=> {
