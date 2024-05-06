@@ -31,8 +31,8 @@ try {
 
 
 //function to dump data in SQS
-const sendUserDetails = async () => {
-    const data = await convertTextFileToString(fileName);
+const sendUserDetails = () => {
+    const data = convertTextFileToString(fileName);
     const subject = data[0];
     const body = data[2].replace(/\s{2,}/g, ' ');
     const params = {
