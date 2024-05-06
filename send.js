@@ -18,12 +18,15 @@ const convertTextFileToString = (fileName)=> {
 
 // function to push data in database
 const pushDataInDatabase = async (subject, body) => {
-console.log('CHECKINGDATABASE', subject, body);
-const date = new Date();
-await client.connect();
-const result = await client.query(`insert into demoschema.email_details(email_id, subject, body, datetime)values($1, $2, $3, $4)`,[2, subject, body, date]);
-console.log(result.rows);    
-client.end();
+try {
+    const date = new Date();
+    await client.connect();
+    const result = await client.query(`insert into demoschema.email_details(email_id, subject, body, datetime)values($1, $2, $3, $4)`,[2, subject, body, date]);
+    console.log(result.rows);    
+    client.end();
+} catch (err) {
+    console.log('ERROR>>>>>>', err);
+}
 };
 
 
@@ -32,7 +35,6 @@ const sendUserDetails = async () => {
     const data = await convertTextFileToString(fileName);
     const subject = data[0];
     const body = data[2].replace(/\s{2,}/g, ' ');
-    console.log('sending', typeof body, body);
     const params = {
         MessageAttributes: {
             "Subject": {
