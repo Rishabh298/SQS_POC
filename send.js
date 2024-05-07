@@ -6,17 +6,21 @@ const prompt = require('./prompt.js');
 AWS.config.update({ region: 'REGION' });
 const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
 
-const fileName = './emailBody.txt'
 
 
 //function to convert text file into string and return an array
-const convertTextFileToString = (fileName) => {
-    const fileData = fs.readFileSync(fileName, "utf8");
-    const dataArr = fileData.split('\\');
-    if (dataArr.length === 3) {
-        return dataArr
-    } else {
-        console.log('There is some problem in text file, seems data is not proper');
+const convertTextFileToString = () => {
+    try {
+        let filePath = prompt('Please give the file path : ');
+        const fileData = fs.readFileSync(filePath, "utf8");
+        const dataArr = fileData.split('\\');
+        if (dataArr.length === 3) {
+            return dataArr
+        } else {
+            console.log('There is some problem in text file, seems data is not proper');
+        }
+    } catch (err) {
+        console.log('Please check the given file path', err);
     }
 
 };
@@ -32,7 +36,11 @@ const pushDataInDatabase = async (subject, body) => {
         client.end();
     } catch (err) {
         if (err.code === '28P01') {
-            console.log('Please enter the correct password', err);
+            console.log('Please enter the correct userName or password', err);
+        } else if (err.code === 'ENOTFOUND') {
+            console.log('Please check the host name properly', err);
+        } else if (err.code === 'ECONNREFUSED') {
+            console.log('there is some problem in connection please check the port number properly', err);
         } else {
             console.log('Getting error from Database', err);
         }
@@ -41,9 +49,9 @@ const pushDataInDatabase = async (subject, body) => {
 
 
 //function to dump data in SQS
-const sendUserDetails = async () => {
+const sendUserDetails = () => {
     let queueUrl = prompt('Enter the queue url : ');
-    const data = await convertTextFileToString(fileName);
+    const data = convertTextFileToString();
     const subject = data[0];
     const body = data[2].replace(/\s{2,}/g, ' ');
     const params = {
@@ -60,17 +68,21 @@ const sendUserDetails = async () => {
         MessageBody: "Email along with subject & body",
         QueueUrl: queueUrl
     }
-    sqs.sendMessage(params, (err, data) => {
-        if (!err) {
-            console.log('SuccessQUEUE', data.MessageId);
-            pushDataInDatabase(subject, body);
-        }
-        else if (err.code === 'UnknownEndpoint') {
-            console.log('Seems queue url is wrong, please check it properly', err);
-        } else {
-            console.log('Queue Error', err);
-        }
-    })
+    try {
+        sqs.sendMessage(params, (err, data) => {
+            if (!err) {
+                console.log('SuccessQUEUE', data.MessageId);
+                pushDataInDatabase(subject, body);
+            }
+            else if (err.code === 'UnknownEndpoint') {
+                console.log('Seems queue url is wrong, please check it properly', err);
+            } else {
+                console.log('Queue Error', err);
+            }
+        })
+    } catch (err) {
+        console.log('There is some problem in SQS syncing or AWS configuration', err);
+    }
 };
 
 sendUserDetails();

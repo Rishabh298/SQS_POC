@@ -10,14 +10,18 @@ let readUserDetails = () => {
         QueueUrl: queueUrl,
         MaxNumberOfMessages: 10,
     };
-    sqs.receiveMessage(params, (err, data) => {
-        if (err) {
-            console.log('Error in receiveing message', err);
-        } else if (data.Messages) {
-            data.Messages.forEach((msg) => {
-                console.log(msg);
-            })
-        }
-    })
+    try {
+        sqs.receiveMessage(params, (err, data) => {
+            if (!err) {
+                data.Messages.forEach((msg) => {
+                    console.log(msg);
+                })
+            } else {
+                console.log('Error in receiving message', err);
+            }
+        })
+    } catch (err) {
+        console.log('There is some problem in SQS syncing or AWS configuration', err);
+    }
 }
 readUserDetails();
